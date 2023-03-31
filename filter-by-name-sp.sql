@@ -3,11 +3,18 @@
 -- If empty shows all articles
 CREATE PROCEDURE dbo.FilterByName
 	@inName VARCHAR(128)
+	, @inPostIdUser INT
+	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT 			--SP result code
 AS
 BEGIN
 	SET NOCOUNT ON;
 	BEGIN TRY
+		DECLARE @logDescription VARCHAR(2000) =
+			'{'
+			+ '"ActionType"="Filtrar por nombre" '
+			+ '"Description"="' +@inName+ '"'
+			+ '}';
 		SET @outResultCode = 0;				-- Succes result code
 		SELECT A.Id
 			, A.[Name]
@@ -19,6 +26,13 @@ BEGIN
 		COLLATE Latin1_general_CI_AI
 		AND A.idArticleType = T.Id
 		ORDER BY A.[Name];
+		INSERT INTO dbo.EventLog
+			VALUES (
+			@logDescription
+			, @inPostIdUser
+			, @inPostIp
+			, GETDATE()
+			);
 	END TRY
 	BEGIN CATCH
 		INSERT INTO dbo.DBErrors
