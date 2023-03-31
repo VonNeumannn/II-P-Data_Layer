@@ -9,10 +9,14 @@ BEGIN
 	SET NOCOUNT ON;
 	BEGIN TRY
 		SET @outResultCode = 0;				-- Succes result code
-		SELECT A.Id, A.[Name], A.Price, T.[Name] AS 'Type'
+		SELECT A.Id
+			, A.[Name]
+			, A.Price
+			, T.[Name] AS 'Type'
 		FROM dbo.Article A
 		INNER JOIN dbo.ArticleType T
-		ON A.[Name] LIKE '%'+@inName+'%' COLLATE Latin1_general_CI_AI
+		ON A.[Name] LIKE '%'+@inName+'%'
+		COLLATE Latin1_general_CI_AI
 		AND A.idArticleType = T.Id
 		ORDER BY A.[Name];
 	END TRY

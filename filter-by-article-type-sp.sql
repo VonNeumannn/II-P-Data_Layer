@@ -8,7 +8,10 @@ BEGIN
     SET NOCOUNT ON;
     BEGIN TRY
         SET @outResultCode = 0              -- Succes code
-        SELECT A.Id, A.[Name], A.Price, T.Name As 'Type'
+        SELECT A.Id
+            , A.[Name]
+            , A.Price
+            , T.Name As 'Type'
         FROM dbo.Article A
         INNER JOIN dbo.ArticleType T
         ON T.Name = @inName
