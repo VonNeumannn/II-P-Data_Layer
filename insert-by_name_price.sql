@@ -5,8 +5,8 @@
 CREATE PROCEDURE dbo.InsertArticle
 	@inName VARCHAR(64)
 	, @inPrice MONEY
-	, @inIdArticleClass INT
-	, @inPostIdUser VARCHAR(64)
+	, @inType VARCHAR(64)
+	, @inPostIdUser INT
 	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT
 
@@ -16,7 +16,8 @@ BEGIN
 
 	BEGIN TRY
 
-		DECLARE @LogDescription VARCHAR(2000)=''
+		DECLARE @LogDescription VARCHAR(2000) = '{Action Type = Insert article successfully '
+		DECLARE @IdArticleClass INT
 		SET @outResultCode = 0;
 
 		-- Validate if article it's already exists
@@ -26,18 +27,23 @@ BEGIN
 				RETURN;
 			END;
 
+		SELECT @IdArticleClass = T.Id 
+		FROM dbo.ArticleType T
+		WHERE @inType = [Name];
+ 
 		SET @LogDescription = 
-			@LogDescription + CONVERT(VARCHAR, @inIdArticleClass) 
-			+ ' ,' + @inName + ' ,' + CONVERT(VARCHAR, @inIdArticleClass)
-			+ CONVERT(VARCHAR, @inPrice);
+			@LogDescription + 'Description = ' 
+			+ CONVERT(VARCHAR, @IdArticleClass) 
+			+ ' ,' + @inName + ' ,'
+			+ CONVERT(VARCHAR, @inPrice) + '}';
 
-		BEGIN TRANSACTION tInsertArticle
+		BEGIN TRANSACTION;
 			INSERT [dbo].Article (
-				[IdArticleType]
-				, [Name]
+				IdArticleType				
+				,[Name]
 				, [Price])
 			VALUES (
-				@inIdArticleClass
+				@IdArticleClass
 				, @inName
 				, @inPrice
 				);
@@ -53,7 +59,7 @@ BEGIN
 				, @inPostIp
 				, GETDATE()
 				);
-		COMMIT TRANSACTION tUpdateArticle
+		COMMIT;
 	
 	END TRY
 	
@@ -61,7 +67,7 @@ BEGIN
 
 		IF @@TRANCOUNT > 0
 		BEGIN
-			ROLLBACK TRANSACTION tUpdateArticle;
+			ROLLBACK;
 		END;
 
 		INSERT INTO dbo.DBErrors	VALUES (
