@@ -13,7 +13,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	BEGIN TRY
-		DECLARE @LogDescription VARCHAR(256) = '{TipoAccion= '
+		DECLARE @LogDescription VARCHAR(256) = '{Action Type= '
 		DECLARE @IdUser INT
 
         SET @outResultCode = 0;  
@@ -25,13 +25,13 @@ BEGIN
 
 		IF @IdUser IS NOT NULL
 		BEGIN
-			SET @LogDescription = @LogDescription + 'Login exitoso ' 
-							+ 'Descripcion= ' + ' }'
+			SET @LogDescription = @LogDescription + 'Successful login ' 
+							+ 'Description= ' + ' }'
 		END
 		ELSE
 		BEGIN
-			SET @LogDescription = @LogDescription + 'Login no exitoso ' 
-							+ 'Descripcion= ' + ' }'
+			SET @LogDescription = @LogDescription + 'Unsuccessful login ' 
+							+ 'Description= ' + ' }'
 		END;
 
 		INSERT dbo.EventLog(

@@ -5,14 +5,16 @@
 
 CREATE PROCEDURE dbo.FilterByAmount
 	@inAmount INT
-	, @inPostIdUser VARCHAR(64)
+	, @inPostIdUser INT
 	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT
 AS
 BEGIN
 	SET NOCOUNT ON;
 	BEGIN TRY
-		DECLARE @LogDescription INT = @inAmount
+		DECLARE @LogDescription VARCHAR(256) = '{Action Type = Consult by amount '
+												+ 'Description = ' 
+												+ CONVERT(VARCHAR, @inAmount) + '}'
         SET @outResultCode = 0;                     -- No error code
 
 			IF @inAmount IS NULL OR (@inAmount = '')
