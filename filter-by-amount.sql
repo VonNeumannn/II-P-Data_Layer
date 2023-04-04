@@ -20,13 +20,13 @@ BEGIN
 
 			IF @inAmount IS NULL OR (@inAmount = '')
 			BEGIN
-				SELECT  A.id			-- Show only @inAmout articles
+				SELECT  A.Id			-- Show only @inAmout articles
 						, T.[Name] AS 'Type'
 						, A.[Name]
 						, A.Price
 				FROM dbo.Article A
 				INNER JOIN dbo.ArticleType T 
-				ON A.IdArticleType = T.id 
+				ON A.IdArticleType = T.Id 
 				ORDER BY A.[Name];
 			END
 		ELSE
