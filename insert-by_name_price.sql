@@ -6,7 +6,7 @@ CREATE PROCEDURE dbo.InsertArticle
 	@inName VARCHAR(64)
 	, @inPrice MONEY
 	, @inType VARCHAR(64)
-	, @inPostIdUser INT
+	, @inPostUser VARCHAR(64)
 	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT
 
@@ -18,6 +18,7 @@ BEGIN
 
 		DECLARE @LogDescription VARCHAR(2000) = '{Action Type = Insert article successfully '
 		DECLARE @IdArticleClass INT
+		DECLARE @postIdUser INT;
 		SET @outResultCode = 0;
 
 		-- Validate if article it's already exists
@@ -37,6 +38,11 @@ BEGIN
 			+ ' ,' + @inName + ' ,'
 			+ CONVERT(VARCHAR, @inPrice) + '}';
 
+		--Select Id from ArticleType
+		SELECT @postIdUser = U.Id
+		FROM dbo.[User] U
+		WHERE @inPostUser = [Name];
+
 		BEGIN TRANSACTION;
 			INSERT [dbo].Article (
 				IdArticleType				
@@ -55,7 +61,7 @@ BEGIN
 				, [PostTime])
 			VALUES (
 				@LogDescription
-				, @inPostIdUser
+				, @postIdUser
 				, @inPostIp
 				, GETDATE()
 				);

@@ -6,7 +6,7 @@
 CREATE PROCEDURE dbo.LoginDB
 	@inUser VARCHAR(64)
 	, @inPassword VARCHAR(64)
-	, @inPostIdUser INT
+	, @inPostUser VARCHAR(64)
 	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT
 AS
@@ -15,11 +15,12 @@ BEGIN
 	BEGIN TRY
 		DECLARE @LogDescription VARCHAR(256) = '{Action Type= '
 		DECLARE @IdUser INT
+		DECLARE @postIdUser INT;
 
         SET @outResultCode = 0;  
 
 		SELECT @IdUser = U.Id
-		FROM dbo.UserLogin U
+		FROM dbo.[User] U
 		WHERE U.[Name] = @inUser
 		AND U.[Password] = @inPassword;
 
@@ -34,6 +35,11 @@ BEGIN
 							+ 'Description= ' + ' }'
 		END;
 
+		--Select Id from ArticleType
+		SELECT @postIdUser = U.Id
+		FROM dbo.[User] U
+		WHERE @inPostUser = [Name];
+
 		INSERT dbo.EventLog(
 				[LogDescription]
 				, [PostIdUser]
@@ -41,7 +47,7 @@ BEGIN
 				, [PostTime])
 			VALUES (
 				@LogDescription
-				, @inPostIdUser
+				, @postIdUser
 				, @inPostIp
 				, GETDATE()
 				);

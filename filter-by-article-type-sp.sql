@@ -2,7 +2,7 @@
 -- Filter articles by type
 CREATE PROCEDURE dbo.FilterByArticleType
     @inName VARCHAR(128)
-	, @inPostIdUser INT
+	, @inPostUser VARCHAR(64)
 	, @inPostIp VARCHAR(64)
     , @outResultCode INT OUTPUT             -- SP result code
 AS
@@ -14,7 +14,9 @@ BEGIN
 			+ '"ActionType"="Filter by article type" '
 			+ '"Description"="' +@inName+ '"'
 			+ '}';
+		DECLARE @postIdUser INT;
         SET @outResultCode = 0              -- Succes code
+
         SELECT A.Id
             , A.[Name]
             , A.Price
@@ -23,10 +25,16 @@ BEGIN
         INNER JOIN dbo.ArticleType T
         ON T.Name = @inName
         AND T.Id = A.IdArticleType;
+
+		--Select Id from ArticleType
+		SELECT @postIdUser = U.Id
+		FROM dbo.[User] U
+		WHERE @inPostUser = [Name];
+
 		INSERT INTO dbo.EventLog
 			VALUES (
 			@logDescription
-			, @inPostIdUser
+			, @postIdUser
 			, @inPostIp
 			, GETDATE()
 			);

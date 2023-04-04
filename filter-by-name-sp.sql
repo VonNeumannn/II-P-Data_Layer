@@ -3,7 +3,7 @@
 -- If empty shows all articles
 CREATE PROCEDURE dbo.FilterByName
 	@inName VARCHAR(128)
-	, @inPostIdUser INT
+	, @inPostUser VARCHAR(64)
 	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT 			--SP result code
 AS
@@ -15,6 +15,7 @@ BEGIN
 			+ '"ActionType"="Filtrar por nombre" '
 			+ '"Description"="' +@inName+ '"'
 			+ '}';
+		DECLARE @postIdUser INT;
 		SET @outResultCode = 0;				-- Succes result code
 		SELECT A.Id
 			, A.[Name]
@@ -26,10 +27,16 @@ BEGIN
 		COLLATE Latin1_general_CI_AI
 		AND A.idArticleType = T.Id
 		ORDER BY A.[Name];
+
+		--Select Id from ArticleType
+		SELECT @postIdUser = U.Id
+		FROM dbo.[User] U
+		WHERE @inPostUser = [Name];
+		
 		INSERT INTO dbo.EventLog
 			VALUES (
 			@logDescription
-			, @inPostIdUser
+			, @postIdUser
 			, @inPostIp
 			, GETDATE()
 			);

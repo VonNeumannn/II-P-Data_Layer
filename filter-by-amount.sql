@@ -5,7 +5,7 @@
 
 CREATE PROCEDURE dbo.FilterByAmount
 	@inAmount INT
-	, @inPostIdUser INT
+	, @inPostUser VARCHAR(64)
 	, @inPostIp VARCHAR(64)
 	, @outResultCode INT OUTPUT
 AS
@@ -15,12 +15,13 @@ BEGIN
 		DECLARE @LogDescription VARCHAR(256) = '{Action Type = Consult by amount '
 												+ 'Description = ' 
 												+ CONVERT(VARCHAR, @inAmount) + '}'
+		DECLARE @postIdUser INT;
         SET @outResultCode = 0;                     -- No error code
 
 			IF @inAmount IS NULL OR (@inAmount = '')
 			BEGIN
 				SELECT  A.id			-- Show only @inAmout articles
-						, T.[Name]
+						, T.[Name] AS 'Type'
 						, A.[Name]
 						, A.Price
 				FROM dbo.Article A
@@ -31,7 +32,7 @@ BEGIN
 		ELSE
 			BEGIN
 				SELECT TOP(@inAmount)A.Id			-- Show only @inAmout articles
-						, T.[Name]
+						, T.[Name] AS 'Type'
 						, A.[Name]
 						, A.Price
 				FROM dbo.Article A
@@ -39,7 +40,12 @@ BEGIN
 				ON A.IdArticleType = T.Id 
 				ORDER BY A.[Name];
 			END
-				--Insert in EventLog table
+		--Select Id from ArticleType
+		SELECT @postIdUser = U.Id
+		FROM dbo.[User] U
+		WHERE @inPostUser = [Name];
+
+		--Insert in EventLog table
 		INSERT dbo.EventLog(
 			[LogDescription]
 			, [PostIdUser]
@@ -47,7 +53,7 @@ BEGIN
 			, [PostTime])
 		VALUES (
 			@LogDescription
-			, @inPostIdUser
+			, @postIdUser
 			, @inPostIp
 			, GETDATE()
 			);
