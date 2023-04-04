@@ -8,6 +8,7 @@ CREATE PROCEDURE dbo.LoginDB
 	, @inPassword VARCHAR(64)
 	, @inPostUser VARCHAR(64)
 	, @inPostIp VARCHAR(64)
+	, @outLoginSuccess INT OUTPUT
 	, @outResultCode INT OUTPUT
 AS
 BEGIN
@@ -26,12 +27,14 @@ BEGIN
 
 		IF @IdUser IS NOT NULL
 		BEGIN
+			SET @outLoginSuccess = 0; 
 			SET @LogDescription = @LogDescription + 'Successful login ' 
 							+ 'Description= ' + ' }'
 		END
 		ELSE
 		BEGIN
-			SET @LogDescription = @LogDescription + 'Unsuccessful login ' 
+			SET @outLoginSuccess = 1;
+			SET @LogDescription = @LogDescription + 'Failed login ' 
 							+ 'Description= ' + ' }'
 		END;
 
